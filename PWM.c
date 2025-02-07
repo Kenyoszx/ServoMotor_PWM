@@ -1,30 +1,34 @@
+// Inclusão das Bibliotecas
 #include <stdio.h>
 #include "pico/stdlib.h"
 #include "pico/time.h"
 #include "hardware/irq.h"
-#include "hardware/pwm.h" //biblioteca para controlar o hardware de PWM
+#include "hardware/pwm.h"
 
+// Definição dos Pinos
 #define PWM_MOTOR 22
 
+// Definição de Constantes
 #define WRAP_PERIOD 20000
 #define PWM_DIVISOR 125.0
 #define MOTOR_STEP 5
 
+// Protótipos de Funções
 uint initMotorPWM();
 void wrapHandler();
 void initMove();
 
 int main()
 {
-    uint slicenum = initMotorPWM();
-    stdio_init_all();
-    initMove();
+    uint slicenum = initMotorPWM(); // inicializa o PWM para o servomotor
+    stdio_init_all();               // Inicializa a entrada e saída padrão
+    initMove();                     // Faz os primeiros movimentos do led antes da rotina
     printf("Interrupção Ativada: ");
-    pwm_set_irq_enabled(slicenum, true);
+    pwm_set_irq_enabled(slicenum, true); // Habilita a rotina de repetição
 
     while (true)
     {
-        
+        // loop infinito
     }
 }
 
@@ -41,13 +45,15 @@ uint initMotorPWM()
 
     pwm_set_clkdiv(sliceMotor, PWM_DIVISOR); // define o divisor de clock do PWM
     pwm_set_wrap(sliceMotor, WRAP_PERIOD);   // definir o valor de wrap
-    pwm_set_gpio_level(PWM_MOTOR, 100);      // definir o ciclo de trabalho (duty cycle) do pwm
+    pwm_set_gpio_level(PWM_MOTOR, 1470);     // definir o ciclo de trabalho (duty cycle) do pwm
     pwm_set_enabled(sliceMotor, true);       // habilita o pwm no slice correspondente
 
     return (sliceMotor);
 }
 void wrapHandler()
 {
+    // Rotina de Interrupção
+
     static int Position = 500;                       // 180°
     static bool rise = true;                         // flag mudar o sentido do movimento
     pwm_clear_irq(pwm_gpio_to_slice_num(PWM_MOTOR)); // resetar o flag de interrupção
@@ -59,7 +65,7 @@ void wrapHandler()
         {                    // caso a Position seja maior que 2470
             Position = 2400; // iguala Position a 2470
             sleep_ms(10);
-            rise = false;    // muda o flag rise para trocar o sentido do movimento
+            rise = false; // muda o flag rise para trocar o sentido do movimento
         }
     }
     else
@@ -69,16 +75,18 @@ void wrapHandler()
         {                   // caso a Position seja menor que 500
             Position = 500; // iguala Position a 500
             sleep_ms(10);
-            rise = true;    // muda o flag rise para trocar o sentido do movimento
+            rise = true; // muda o flag rise para trocar o sentido do movimento
         }
     }
     pwm_set_gpio_level(PWM_MOTOR, Position); // define o ciclo ativo (Ton) de forma quadrática, para acentuar a variação de luminosidade.
 }
-void initMove(){
-    pwm_set_gpio_level(PWM_MOTOR, 2400);
-    sleep_ms(5000);
-    pwm_set_gpio_level(PWM_MOTOR, 1470);
-    sleep_ms(5000);
-    pwm_set_gpio_level(PWM_MOTOR, 500);
-    sleep_ms(5000);
+void initMove()
+{
+    // Movimentos pré rotina de repetição
+    pwm_set_gpio_level(PWM_MOTOR, 2400); // Põe o servomotor em 0°
+    sleep_ms(5000);                      // Aguarda 5 segundos
+    pwm_set_gpio_level(PWM_MOTOR, 1470); // Põe o servomotor em 90°
+    sleep_ms(5000);                      // Aguarda 5 segundos
+    pwm_set_gpio_level(PWM_MOTOR, 500);  // Põe o servomotor em 180°
+    sleep_ms(5000);                      // Aguarda 5 segundos
 }
