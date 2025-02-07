@@ -12,21 +12,16 @@
 
 uint initMotorPWM();
 void wrapHandler();
+void initMove();
 
 int main()
 {
     uint slicenum = initMotorPWM();
     stdio_init_all();
-
-    pwm_set_gpio_level(PWM_MOTOR, 2400);
-    sleep_ms(5000);
-    pwm_set_gpio_level(PWM_MOTOR, 1470);
-    sleep_ms(5000);
-    pwm_set_gpio_level(PWM_MOTOR, 500);
-    sleep_ms(5000);
+    initMove();
     printf("Interrupção Ativada: ");
     pwm_set_irq_enabled(slicenum, true);
-    
+
     while (true)
     {
         
@@ -78,4 +73,12 @@ void wrapHandler()
         }
     }
     pwm_set_gpio_level(PWM_MOTOR, Position); // define o ciclo ativo (Ton) de forma quadrática, para acentuar a variação de luminosidade.
+}
+void initMove(){
+    pwm_set_gpio_level(PWM_MOTOR, 2400);
+    sleep_ms(5000);
+    pwm_set_gpio_level(PWM_MOTOR, 1470);
+    sleep_ms(5000);
+    pwm_set_gpio_level(PWM_MOTOR, 500);
+    sleep_ms(5000);
 }
