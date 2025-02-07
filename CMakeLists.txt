@@ -46,7 +46,10 @@ pico_enable_stdio_usb(PWM 1)
 
 # Add the standard library to the build
 target_link_libraries(PWM
-        pico_stdlib)
+        pico_stdlib
+        pico_time
+        hardware_irq
+        hardware_pwm)
 
 # Add the standard include files to the build
 target_include_directories(PWM PRIVATE
@@ -55,7 +58,6 @@ target_include_directories(PWM PRIVATE
 
 # Add any user requested libraries
 target_link_libraries(PWM 
-        
         )
 
 pico_add_extra_outputs(PWM)
