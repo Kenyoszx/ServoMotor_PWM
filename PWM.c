@@ -10,65 +10,72 @@
 #define PWM_DIVISOR 125.0
 #define MOTOR_STEP 5
 
-void init();
+uint initMotorPWM();
 void wrapHandler();
 
 int main()
 {
+    uint slicenum = initMotorPWM();
     stdio_init_all();
-    init();
 
+    pwm_set_gpio_level(PWM_MOTOR, 2400);
+    sleep_ms(5000);
+    pwm_set_gpio_level(PWM_MOTOR, 1470);
+    sleep_ms(5000);
+    pwm_set_gpio_level(PWM_MOTOR, 500);
+    sleep_ms(5000);
+    printf("Interrupção Ativada: ");
+    pwm_set_irq_enabled(slicenum, true);
+    
     while (true)
     {
-        pwm_set_gpio_level(PWM_MOTOR, 2400);
-        sleep_ms(5000);
-        pwm_set_gpio_level(PWM_MOTOR, 1470);
-        sleep_ms(5000);
-        pwm_set_gpio_level(PWM_MOTOR, 500);
-        sleep_ms(5000);
+        
     }
 }
 
-void init()
+uint initMotorPWM()
 {
-    // inicializa os pinos
+    // inicializa o pwm do ServoMotor
 
     gpio_set_function(PWM_MOTOR, GPIO_FUNC_PWM);        // habilitar o pino GPIO como PWM
     uint sliceMotor = pwm_gpio_to_slice_num(PWM_MOTOR); // obter o canal PWM da GPIO
 
     pwm_clear_irq(sliceMotor);                            // Reseta a flag de interrupção para o slice do motor
-    irq_set_exclusive_handler(PWM_IRQ_WRAP, wrapHandler); //interrupção quando o contador do slice atinge o wrap
+    irq_set_exclusive_handler(PWM_IRQ_WRAP, wrapHandler); // interrupção quando o contador do slice atinge o wrap
     irq_set_enabled(PWM_IRQ_WRAP, true);                  // Habilitar ou desabilitar uma interrupção específica
 
     pwm_set_clkdiv(sliceMotor, PWM_DIVISOR); // define o divisor de clock do PWM
     pwm_set_wrap(sliceMotor, WRAP_PERIOD);   // definir o valor de wrap
     pwm_set_gpio_level(PWM_MOTOR, 100);      // definir o ciclo de trabalho (duty cycle) do pwm
     pwm_set_enabled(sliceMotor, true);       // habilita o pwm no slice correspondente
+
+    return (sliceMotor);
 }
 void wrapHandler()
 {
-    static int fade = 0;                             // nível de iluminação
-    static bool rise = true;                         // flag para elevar ou reduzir a iluminação
+    static int Position = 500;                       // 180°
+    static bool rise = true;                         // flag mudar o sentido do movimento
     pwm_clear_irq(pwm_gpio_to_slice_num(PWM_MOTOR)); // resetar o flag de interrupção
 
     if (rise)
-    {           // caso a iluminação seja elevada
-        fade++; // aumenta o nível de brilho
-        if (fade > 255)
-        {                 // caso o fade seja maior que 255
-            fade = 255;   // iguala fade a 255
-            rise = false; // muda o flag rise para redução do nível de iluminação
+    {
+        Position += MOTOR_STEP; // Roda no sentido horário
+        if (Position > 2400)
+        {                    // caso a Position seja maior que 2470
+            Position = 2400; // iguala Position a 2470
+            sleep_ms(10);
+            rise = false;    // muda o flag rise para trocar o sentido do movimento
         }
     }
     else
-    {           // caso a iluminação seja reduzida
-        fade--; // reduz o nível de brilho
-        if (fade < 0)
-        {                // Icaso o fade seja menor que 0
-            fade = 0;    // iguala fade a 0
-            rise = true; // muda o flag rise para elevação no nível de iluminação
+    {
+        Position -= MOTOR_STEP; // Roda no sentido anti-horário
+        if (Position < 500)
+        {                   // caso a Position seja menor que 500
+            Position = 500; // iguala Position a 500
+            sleep_ms(10);
+            rise = true;    // muda o flag rise para trocar o sentido do movimento
         }
     }
-
-    pwm_set_gpio_level(PWM_MOTOR, fade * fade); // define o ciclo ativo (Ton) de forma quadrática, para acentuar a variação de luminosidade.
+    pwm_set_gpio_level(PWM_MOTOR, Position); // define o ciclo ativo (Ton) de forma quadrática, para acentuar a variação de luminosidade.
 }

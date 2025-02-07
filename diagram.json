@@ -1,0 +1,17 @@
+{
+    "version": 1,
+    "author": "João Victor de Souza Silva",
+    "editor": "wokwi",
+    "parts": [
+      { "type": "board-pi-pico-w", "id": "pico", "top": 6.35, "left": -44.45, "attrs": {} },
+      { "type": "wokwi-servo", "id": "servo1", "top": 26.8, "left": 96, "attrs": {} }
+    ],
+    "connections": [
+      [ "pico:GP0", "$serialMonitor:RX", "", [] ],
+      [ "pico:GP1", "$serialMonitor:TX", "", [] ],
+      [ "servo1:GND", "pico:GND.8", "black", [ "h0", "v-38.4" ] ],
+      [ "servo1:V+", "pico:3V3", "red", [ "h0", "v-28.7" ] ],
+      [ "servo1:PWM", "pico:GP22", "gold", [ "h0", "v29" ] ]
+    ],
+    "dependencies": {}
+  }
