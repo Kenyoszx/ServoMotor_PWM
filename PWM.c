@@ -7,6 +7,9 @@
 
 // Definição dos Pinos
 #define PWM_MOTOR 22
+//#define PWM_MOTOR 12
+
+// Para testar o Funcionamento no led azul deixe comentada a linha 9 e remova o // para descomentar a linha 10
 
 // Definição de Constantes
 #define WRAP_PERIOD 20000

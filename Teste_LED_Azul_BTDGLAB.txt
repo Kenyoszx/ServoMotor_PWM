@@ -1,0 +1,4 @@
+Ao fazer o teste substituindo o pino do servomotor (22) 
+por o pino do LED azul na plataforma bitdoglab (12), é possível perceber 
+que a intensidade do LED diminui ao se aproximar do valor em que o servomotor chega a 0° 
+e cresce na medida que se aproxima dos 180° do servomotor. 
