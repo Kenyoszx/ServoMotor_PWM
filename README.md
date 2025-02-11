@@ -15,7 +15,7 @@ O algoritmo implementa o controle de um servomotor através do microcontrolador 
 
 ## Pinagem
 
--Servo Motor: Pino 22
+- Servo Motor: Pino 22
 
 ## Configuração do Ambiente
 
